@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshay Chame | Unified Financial Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .net-worth-text {
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .chart-container {
+            height: 33vh;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 0.5rem;
+            height: 100%;
+            padding: 0.5rem;
+        }
+
+        .income-pill {
+            animation: pulse 2s infinite;
+            padding: 0.25rem 0.5rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        body.dark-mode {
+            padding: 0;
+            margin: 0;
+            line-height: 1.4;
+            background-image: url('op.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: white;
+            overflow: hidden;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        body.light-mode {
+            padding: 0;
+            margin: 0;
+            line-height: 1.4;
+            background-image: url('op.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        body.light-mode::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+        }
+
+        .money-emoji {
+            display: inline-block;
+            margin-right: 0.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .light-mode .glow-text {
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0;
+            backdrop-filter: blur(10px);
+            height: 7vh;
+        }
+
+        .dark-mode header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            height: 89vh;
+            overflow: hidden;
+            padding: 0.5rem 0.5rem;
+        }
+
+        .chart-view {
+            height: 89vh;
+            overflow: hidden;
+            padding: 0.5rem 0.5rem;
+        }
+
+        footer {
+            padding: 0.5rem;
+            backdrop-filter: blur(10px);
+            height: 4vh;
+        }
+
+        .dark-mode footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .light-mode .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    rgba(255, 255, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        .light-mode .shimmer {
+            background: linear-gradient(90deg,
+                    rgba(0, 0, 0, 0) 0%,
+                    rgba(0, 0, 0, 0.05) 50%,
+                    rgba(0, 0, 0, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Toggle Switch Styles */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+        }
+
+        input:checked+.slider {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+            background-color: #10b981;
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .mode-icon {
+            font-size: 18px;
+            margin: 0 8px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            padding: 0.25rem 0;
+            margin-right: 0.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .dark-mode .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode .tab-btn {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Canvas sizing for charts view */
+        .chart-view canvas {
+            width: 100% !important;
+            height: calc(100% - 1.5rem) !important;
+        }
+
+        /* Hidden view class */
+        .hidden-view {
+            display: none;
+        }
+
+        /* Compact card styles */
+        .compact-card {
+            height: 280px;
+        }
+
+        /* Compact font sizes */
+        .text-compact-lg {
+            font-size: 1.1rem;
+        }
+
+        .text-compact-md {
+            font-size: 0.9rem;
+        }
+
+        .text-compact-sm {
+            font-size: 0.8rem;
+        }
+
+        /* Full width container */
+        .full-width {
+            width: 100vw;
+            max-width: 100vw;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    </style>
+</head>
+
+<body class="dark-mode">
+    <!-- Header -->
+    <header class="backdrop-blur-md bg-black/30 sticky top-0 z-10 w-full">
+        <div class="flex justify-between items-center h-full">
+            <div class="flex items-center">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mr-2 shadow-lg border-2 border-white/20">
+                    <span class="text-sm font-bold">AC</span>
+                </div>
+                <h1 class="text-xl font-bold gradient-text">Akshay Chame</h1>
+            </div>
+
+            <div class="flex items-center">
+                <div class="theme-switch-wrapper mr-2"></div>
+                <span class="mode-icon">☀️</span>
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" checked />
+                    <div class="slider round"></div>
+                </label>
+                <span class="mode-icon">🌙</span>
+            </div>
+
+            <div class="text-right">
+                <div class="text-xl font-bold net-worth-text glow-text" id="netWorth">💰 $765,000,000</div>
+                <div class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">Total Net Worth</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard View -->
+    <main id="dashboard-view" class="w-full px-2 overflow-y-auto" style="max-height: 89vh;">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <!-- Net Worth Trend Chart -->
+            <div class="card col-span-2 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-2"><span class="money-emoji">📈</span> Net Worth Trend</h3>
+                <canvas id="netWorthChart"></canvas>
+            </div>
+
+            <!-- Real-time Income Counter - Enhanced with animations -->
+            <div
+                class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect dark:bg-gradient-to-br dark:from-indigo-800/80 dark:to-indigo-950/80 light:bg-gradient-to-br light:from-blue-100/80 light:to-indigo-200/80 hover:scale-[1.02] transition-all duration-300 ease-in-out">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-compact-lg font-bold"><span class="money-emoji animate-bounce">💸</span> Real-time
+                        Income</h3>
+                    <span
+                        class="income-pill rounded-full text-compact-sm font-medium bg-gradient-to-r from-green-500 to-emerald-400 text-white px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-emerald-500/30">LIVE</span>
+                </div>
+
+                <div
+                    class="mb-2 dark:bg-indigo-900/50 light:bg-indigo-100/50 p-3 rounded-lg backdrop-blur-sm dark:border-indigo-700/30 light:border-indigo-200/30 border transform transition-all duration-300 hover:translate-x-1 hover:shadow-lg">
+                    <div class="text-compact-sm dark:text-indigo-200 light:text-indigo-800 mb-1 font-medium">Total
+                        Income Per Second</div>
+                    <div class="text-xl font-bold flex items-center">
+                        <span class="mr-2 income-value">$3.97</span>
+                        <span
+                            class="text-compact-sm dark:text-indigo-300 light:text-indigo-500 bg-opacity-50 dark:bg-indigo-500/20 light:bg-indigo-300/30 px-2 py-0.5 rounded">/second</span>
+                    </div>
+                </div>
+
+                <div
+                    class="mb-2 dark:bg-indigo-900/50 light:bg-indigo-100/50 p-3 rounded-lg backdrop-blur-sm dark:border-indigo-700/30 light:border-indigo-200/30 border transform transition-all duration-300 hover:translate-x-1 hover:shadow-lg">
+                    <div class="text-compact-sm dark:text-indigo-200 light:text-indigo-800 mb-1 font-medium">Session
+                        Earnings</div>
+                    <div class="text-xl font-bold income-value-glow" id="sessionEarnings">$0.00</div>
+                    <div class="text-compact-sm dark:text-indigo-300 light:text-indigo-500 flex items-center mt-1">
+                        <span id="secondsElapsed">in 0.0 seconds</span>
+                        <div class="relative ml-3">
+                            <div class="w-2 h-2 rounded-full bg-green-500 animate-ping absolute"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    @keyframes numberspin {
+                        0% {
+                            transform: translateY(0);
+                        }
+
+                        50% {
+                            transform: translateY(-2px);
+                        }
+
+                        100% {
+                            transform: translateY(0);
+                        }
+                    }
+
+                    .income-value {
+                        background: linear-gradient(90deg, #10B981, #3B82F6);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        animation: numberspin 2s ease-in-out infinite;
+                    }
+
+                    .income-value-glow {
+                        text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+                        transition: text-shadow 0.3s ease;
+                    }
+
+                    .income-value-glow:hover {
+                        text-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+                    }
+                </style>
+
+                <div class="space-y-2 transition-all duration-500 ease-in-out">
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-compact-sm">
+                            <span class="dark:text-indigo-200 light:text-indigo-800">Investments</span>
+                            <span class="font-medium" id="investmentsEarnings">$0.00</span>
+                        </div>
+                        <div
+                            class="w-full h-3 dark:bg-indigo-950/80 light:bg-indigo-100/80 rounded-full overflow-hidden dark:border-indigo-800/30 light:border-indigo-300/30 border">
+                            <div class="h-full relative w-[80%] shimmer"
+                                style="background: linear-gradient(90deg, #4F46E5, #818CF8);"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-compact-sm">
+                            <span class="dark:text-indigo-200 light:text-indigo-800">Freelancing</span>
+                            <span class="font-medium" id="freelancingEarnings">$0.00</span>
+                        </div>
+                        <div
+                            class="w-full h-3 dark:bg-indigo-950/80 light:bg-indigo-100/80 rounded-full overflow-hidden dark:border-indigo-800/30 light:border-indigo-300/30 border">
+                            <div class="h-full relative w-[8%] shimmer"
+                                style="background: linear-gradient(90deg, #8B5CF6, #A78BFA);"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-compact-sm">
+                            <span class="dark:text-indigo-200 light:text-indigo-800">Government Job</span>
+                            <span class="font-medium" id="govJobEarnings">$0.00</span>
+                        </div>
+                        <div
+                            class="w-full h-3 dark:bg-indigo-950/80 light:bg-indigo-100/80 rounded-full overflow-hidden dark:border-indigo-800/30 light:border-indigo-300/30 border">
+                            <div class="h-full relative w-[12%] shimmer"
+                                style="background: linear-gradient(90deg, #EC4899, #F472B6);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wealth Allocation - Simplified with numbers only -->
+            <div class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-3"><span class="money-emoji">💼</span> Wealth Allocation</h3>
+                <div class="space-y-3">
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#8B5CF6]"></div>
+                            <span class="text-compact-md">Charity & Impact</span>
+                        </div>
+                        <span class="font-bold">40%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#EC4899]"></div>
+                            <span class="text-compact-md">Luxury Cars</span>
+                        </div>
+                        <span class="font-bold">30%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#3B82F6]"></div>
+                            <span class="text-compact-md">Global Travel</span>
+                        </div>
+                        <span class="font-bold">10%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#10B981]"></div>
+                            <span class="text-compact-md">Savings & Reserves</span>
+                        </div>
+                        <span class="font-bold">20%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Annual Income Sources - Simplified with numbers only -->
+            <div class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-3"><span class="money-emoji">💲</span> Annual Income Sources
+                </h3>
+                <div class="space-y-3">
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#059669]"></div>
+                            <span class="text-compact-md">Corporate Job</span>
+                        </div>
+                        <span class="font-bold">$360,000</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#7C3AED]"></div>
+                            <span class="text-compact-md">Freelancing</span>
+                        </div>
+                        <span class="font-bold">$10,000,000</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#2563EB]"></div>
+                            <span class="text-compact-md">Gov Job</span>
+                        </div>
+                        <span class="font-bold">$15,000,000</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#F59E0B]"></div>
+                            <span class="text-compact-md">Investments</span>
+                        </div>
+                        <span class="font-bold">$100,000,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Analytics - Simplified with numbers only -->
+            <div class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-3"><span class="money-emoji">📊</span> Portfolio Analytics</h3>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <div
+                        class="rounded-lg dark:border-white/20 light:border-black/10 p-2 dark:bg-white/5 light:bg-black/5 border">
+                        <div class="text-compact-sm dark:text-gray-300 light:text-gray-600 mb-1">Total Portfolio Value
+                        </div>
+                        <div class="text-lg font-bold">$153,000,000</div>
+                    </div>
+                    <div
+                        class="rounded-lg dark:border-white/20 light:border-black/10 p-2 dark:bg-white/5 light:bg-black/5 border">
+                        <div class="text-compact-sm dark:text-gray-300 light:text-gray-600 mb-1">Performance</div>
+                        <div class="text-lg font-bold text-green-500">+13.8%</div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#3B82F6]"></div>
+                            <span class="text-compact-md">Equities</span>
+                        </div>
+                        <span class="font-bold">35%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#8B5CF6]"></div>
+                            <span class="text-compact-md">Fixed Income</span>
+                        </div>
+                        <span class="font-bold">15%</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center p-2 rounded-lg dark:bg-white/10 light:bg-black/10 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2 bg-[#EC4899]"></div>
+                            <span class="text-compact-md">Real Estate</span>
+                        </div>
+                        <span class="font-bold">20%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Philanthropic Impact -->
+            <div
+                class="card col-span-2 rounded-xl shadow-xl h-[280px] glass-effect dark:bg-gradient-to-r dark:from-purple-700/80 dark:to-violet-900/80 light:bg-gradient-to-r light:from-purple-100/80 light:to-violet-200/80">
+                <h3 class="text-compact-lg font-bold mb-2"><span class="money-emoji">🎁</span> Philanthropic Impact</h3>
+                <div class="mb-2">
+                    <div class="text-compact-sm dark:text-purple-200 light:text-purple-800 mb-1">Total Charity
+                        Allocation</div>
+                    <div class="text-xl font-bold">$306,000,000</div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between mb-1">
+                            <h4 class="font-medium text-compact-md">Education</h4>
+                            <span class="dark:text-purple-200 light:text-purple-800 text-compact-sm">$85,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-purple-200 light:text-purple-800 mb-1">Funded 150 schools in
+                            underserved areas</p>
+                        <div class="mt-1 w-full h-2 rounded-full overflow-hidden dark:bg-white/20 light:bg-black/20">
+                            <div class="h-full bg-purple-300 w-[28%] shimmer"></div>
+                        </div>
+                    </div>
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between mb-1">
+                            <h4 class="font-medium text-compact-md">Healthcare</h4>
+                            <span class="dark:text-purple-200 light:text-purple-800 text-compact-sm">$76,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-purple-200 light:text-purple-800 mb-1">Built 25 hospitals
+                            and medical centers</p>
+                        <div class="mt-1 w-full h-2 rounded-full overflow-hidden dark:bg-white/20 light:bg-black/20">
+                            <div class="h-full bg-purple-300 w-[25%] shimmer"></div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between mb-1">
+                            <h4 class="font-medium text-compact-md">Environment</h4>
+                            <span class="dark:text-purple-200 light:text-purple-800 text-compact-sm">$65,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-purple-200 light:text-purple-800 mb-1">Conservation of 2M
+                            acres of rainforest</p>
+                        <div class="mt-1 w-full h-2 rounded-full overflow-hidden dark:bg-white/20 light:bg-black/20">
+                            <div class="h-full bg-purple-300 w-[21%] shimmer"></div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between mb-1">
+                            <h4 class="font-medium text-compact-md">Clean Energy</h4>
+                            <span class="dark:text-purple-200 light:text-purple-800 text-compact-sm">$80,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-purple-200 light:text-purple-800 mb-1">Funded solar farms in
+                            35 communities</p>
+                        <div class="mt-1 w-full h-2 rounded-full overflow-hidden dark:bg-white/20 light:bg-black/20">
+                            <div class="h-full bg-purple-300 w-[26%] shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Luxury Expenses + Savings Goals Combined -->
+            <div class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-2"><span class="money-emoji">🏎️</span> Luxury Collection</h3>
+                <div class="grid grid-cols-1 gap-2">
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full mr-2 bg-[#F87171]"></div>
+                                <h4 class="font-medium text-compact-md">Supercars</h4>
+                            </div>
+                            <span class="dark:text-pink-200 light:text-pink-800 text-compact-sm">$95,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-pink-200 light:text-pink-800 mt-1">Collection of 28 rare
+                            vehicles</p>
+                    </div>
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full mr-2 bg-[#FB7185]"></div>
+                                <h4 class="font-medium text-compact-md">Hypercars</h4>
+                            </div>
+                            <span class="dark:text-pink-200 light:text-pink-800 text-compact-sm">$70,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-pink-200 light:text-pink-800 mt-1">5 one-of-a-kind custom
+                            hypercars</p>
+                    </div>
+                    <div class="rounded-lg p-2 backdrop-blur-sm dark:bg-white/10 light:bg-black/10">
+                        <div class="flex justify-between">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full mr-2 bg-[#60A5FA]"></div>
+                                <h4 class="font-medium text-compact-md">Properties</h4>
+                            </div>
+                            <span class="dark:text-pink-200 light:text-pink-800 text-compact-sm">$65,000,000</span>
+                        </div>
+                        <p class="text-compact-sm dark:text-pink-200 light:text-pink-800 mt-1">8 luxury vacation homes
+                            worldwide</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Charts Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <!-- Asset Growth Projection Chart -->
+            <div class="card col-span-2 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-2"><span class="money-emoji">🚀</span> Asset Growth Projection
+                </h3>
+                <canvas id="assetGrowthChart"></canvas>
+            </div>
+
+            <!-- Monthly Cash Flow Chart -->
+            <div class="card col-span-1 rounded-xl shadow-xl h-[280px] glass-effect">
+                <h3 class="text-compact-lg font-bold mb-2"><span class="money-emoji">💵</span> Monthly Cash Flow</h3>
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-1 px-4 text-center glass-effect w-full">
+        <p class="dark:text-gray-400 light:text-gray-600 text-xs">© 2025 Akshay Chame | Personal Financial Dashboard for
+            Ultra-High Net Worth Individual 💎</p>
+    </footer>
+
+    <script>
+        // Theme switching functionality
+        const toggleSwitch = document.querySelector('#checkbox');
+        const body = document.querySelector('body');
+
+        // Check for saved theme preference or use dark as default
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+
+        // Set initial theme based on saved preference
+        if (currentTheme === 'light') {
+            body.classList.replace('dark-mode', 'light-mode');
+            toggleSwitch.checked = false;
+        }
+
+        // Switch theme function
+        function switchTheme(e) {
+            if (e.target.checked) {
+                body.classList.replace('light-mode', 'dark-mode');
+                localStorage.setItem('theme', 'dark');
+                updateChartsForTheme('dark');
+            } else {
+                body.classList.replace('dark-mode', 'light-mode');
+                localStorage.setItem('theme', 'light');
+                updateChartsForTheme('light');
+            }
+        }
+
+        // Event listener for theme switch
+        toggleSwitch.addEventListener('change', switchTheme, false);
+
+        // Function to update chart themes
+        function updateChartsForTheme(theme) {
+            // Set Chart.js defaults based on theme
+            const textColor = theme === 'dark' ? '#fff' : '#1a202c';
+            const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+            Chart.defaults.color = textColor;
+            Chart.defaults.scale.grid.color = gridColor;
+
+            // Refresh all charts with new theme
+            window.netWorthChart.update();
+            window.assetGrowthChart.update();
+            window.cashFlowChart.update();
+        }
+
+        // Initialize charts once the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set Chart.js defaults based on initial theme
+            const initialTheme = localStorage.getItem('theme') || 'dark';
+            const textColor = initialTheme === 'dark' ? '#fff' : '#1a202c';
+            const gridColor = initialTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+            Chart.defaults.color = textColor;
+            Chart.defaults.scale.grid.color = gridColor;
+
+            // Net Worth Trend Chart - Modified to show continuous increase
+            const netWorthCtx = document.getElementById('netWorthChart').getContext('2d');
+            window.netWorthChart = new Chart(netWorthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+                    datasets: [{
+                        label: 'Net Worth',
+                        data: [500, 550, 620, 690, 725, 765, 820],
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 3,
+                        tension: 0.2,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: 'rgba(99, 102, 241, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function (value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return 'Net Worth: $' + context.raw + ' million';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Asset Growth Projection Chart - Modified to show continuous increase
+            const assetGrowthCtx = document.getElementById('assetGrowthChart').getContext('2d');
+            window.assetGrowthChart = new Chart(assetGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2025', '2026', '2027', '2028', '2029', '2030'],
+                    datasets: [
+                        {
+                            label: 'Conservative Growth',
+                            data: [765, 820, 880, 940, 1010, 1080],
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Moderate Growth',
+                            data: [765, 850, 945, 1050, 1180, 1320],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Aggressive Growth',
+                            data: [765, 880, 1010, 1170, 1350, 1550],
+                            borderColor: '#EC4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function (value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': $' + context.raw + ' million';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Monthly Cash Flow Chart
+            const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+            window.cashFlowChart = new Chart(cashFlowCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [12.5, 11.8, 14.2, 13.5, 12.9, 15.6, 14.8, 13.9, 15.2, 14.9, 16.1, 18.5],
+                            backgroundColor: '#10B981',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [8.2, 7.5, 8.9, 8.1, 7.8, 9.2, 8.5, 7.9, 9.5, 9.1, 10.2, 12.8],
+                            backgroundColor: '#EF4444',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function (value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': $' + context.raw + ' million';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Real-time income counter and net worth updater
+            let secondsElapsed = 0;
+            const incomePerSecond = {
+                investments: 3.17,
+                freelancing: 0.317,
+                govJob: 0.475
+            };
+            let totalEarned = {
+                investments: 0,
+                freelancing: 0,
+                govJob: 0
+            };
+
+            // Get stored net worth from localStorage or use default value
+            let currentNetWorth = parseFloat(localStorage.getItem('currentNetWorth')) || 765000000;
+            let lastUpdated = parseInt(localStorage.getItem('lastNetWorthUpdate')) || Date.now();
+
+            // Calculate how much time has passed since last visit and increase net worth accordingly
+            const timeElapsedSinceLastVisit = (Date.now() - lastUpdated) / 1000; // in seconds
+            const totalIncomePerSecond = Object.values(incomePerSecond).reduce((sum, val) => sum + val, 0);
+
+            // Add accumulated income since last visit (if within reasonable bounds)
+            if (timeElapsedSinceLastVisit > 0 && timeElapsedSinceLastVisit < 60 * 60 * 24 * 30) { // Limit to 30 days max
+                currentNetWorth += timeElapsedSinceLastVisit * totalIncomePerSecond * 10; // scaled for visual effect
+            }
+
+            // Update display with current value immediately
+            document.getElementById('netWorth').textContent = '💰 $' + Math.floor(currentNetWorth).toLocaleString();
+
+            setInterval(() => {
+                secondsElapsed += 0.1;
+
+                // Update each income source
+                for (const source in incomePerSecond) {
+                    totalEarned[source] += incomePerSecond[source] * 0.1;
+                }
+
+                // Update the display
+                document.getElementById('investmentsEarnings').textContent = '$' + totalEarned.investments.toFixed(2);
+                document.getElementById('freelancingEarnings').textContent = '$' + totalEarned.freelancing.toFixed(2);
+                document.getElementById('govJobEarnings').textContent = '$' + totalEarned.govJob.toFixed(2);
+
+                // Calculate and update total session earnings
+                const totalSession = Object.values(totalEarned).reduce((sum, val) => sum + val, 0);
+                document.getElementById('sessionEarnings').textContent = '$' + totalSession.toFixed(2);
+                document.getElementById('secondsElapsed').textContent = 'in ' + secondsElapsed.toFixed(1) + ' seconds';
+
+                // Increase net worth in real-time (very slight increase to be visible)
+                currentNetWorth += 100;
+                document.getElementById('netWorth').textContent = '💰 $' + Math.floor(currentNetWorth).toLocaleString();
+
+                // Save current net worth to localStorage every 3 seconds
+                if (Math.floor(secondsElapsed) % 3 === 0) {
+                    localStorage.setItem('currentNetWorth', currentNetWorth.toString());
+                    localStorage.setItem('lastNetWorthUpdate', Date.now().toString());
+                }
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>
