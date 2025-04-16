@@ -978,13 +978,65 @@
             const totalIncomePerSecond = Object.values(incomePerSecond).reduce((sum, val) => sum + val, 0);
 
             // Add accumulated income since last visit (if within reasonable bounds)
-            if (timeElapsedSinceLastVisit > 0 && timeElapsedSinceLastVisit < 60 * 60 * 24 * 30) { // Limit to 30 days max
-                currentNetWorth += timeElapsedSinceLastVisit * totalIncomePerSecond * 10; // scaled for visual effect
+            if (timeElapsedSinceLastVisit > 0 && timeElapsedSinceLastVisit < 60 * 60 * 24 * 365) { // Extend to 1 year max
+                // Use a more accurate calculation based on per-second income
+                const earnedWhileAway = timeElapsedSinceLastVisit * totalIncomePerSecond * 10;
+                currentNetWorth += earnedWhileAway;
+
+                // Display a notification about earnings while away
+                if (timeElapsedSinceLastVisit > 60) { // Only for absences longer than a minute
+                    const earnedFormatted = Math.floor(earnedWhileAway).toLocaleString();
+                    const timeAway = formatTimeAway(timeElapsedSinceLastVisit);
+                    showEarningsNotification(earnedFormatted, timeAway);
+                }
             }
 
             // Update display with current value immediately
             document.getElementById('netWorth').textContent = '💰 $' + Math.floor(currentNetWorth).toLocaleString();
 
+            // Add these helper functions for better user experience
+            function formatTimeAway(seconds) {
+                if (seconds < 60) return Math.floor(seconds) + ' seconds';
+                if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes';
+                if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours';
+                return Math.floor(seconds / 86400) + ' days';
+            }
+
+            function showEarningsNotification(amount, timeAway) {
+                // Create a notification element
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg z-50 animate-fade-in-out';
+                notification.innerHTML = `<div class="flex items-center">
+                    <span class="text-2xl mr-2">💰</span>
+                    <div>
+                        <p class="font-bold">While you were away (${timeAway})</p>
+                        <p>You earned $${amount}</p>
+                    </div>
+                </div>`;
+
+                // Add animation class
+                document.head.insertAdjacentHTML('beforeend', `
+                    <style>
+                        @keyframes fadeInOut {
+                            0% { opacity: 0; transform: translateY(-20px); }
+                            10% { opacity: 1; transform: translateY(0); }
+                            90% { opacity: 1; transform: translateY(0); }
+                            100% { opacity: 0; transform: translateY(-20px); }
+                        }
+                        .animate-fade-in-out {
+                            animation: fadeInOut 5s forwards;
+                        }
+                    </style>
+                `);
+
+                // Add to DOM and remove after animation
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+
+            // Update net worth more frequently and save to localStorage
             setInterval(() => {
                 secondsElapsed += 0.1;
 
